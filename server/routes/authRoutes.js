@@ -17,6 +17,6 @@ router.post("/verify-otp", verifyOPT);
 router.post("/resend-otp", resendOTP);
 router.post("/login", login);
 router.post("/logout", logout);
-router.post("/dashboard", authMiddleware, dashboard);
+router.get("/dashboard", authMiddleware, dashboard);
 
 export default router;

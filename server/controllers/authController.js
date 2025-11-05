@@ -88,14 +88,14 @@ export const verifyOPT = async (req, res) => {
 
 // Rsend OTP
 
+
 export const resendOTP = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email });
 
-    if (!user) return res.status(400).josn({ message: "User not Found" });
-    if (user.isVerified)
-      return res.status(400).json({ message: "User already Verified" });
+    if (!user) return res.status(400).json({ message: "User not Found" });
+    if (user.isVerified) return res.status(400).json({ message: "User already Verified" });
 
     const otp = generateOTP();
     user.otp = otp;
@@ -108,10 +108,15 @@ export const resendOTP = async (req, res) => {
       subject: "Resend OTP Verification",
       text: `Your new OTP is: ${otp}`,
     });
+
+    // IMPORTANT: send a response
+    return res.json({ message: "OTP resent successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error resending OTP", error });
+    console.error("resendOTP error:", error);
+    return res.status(500).json({ message: "Error resending OTP", error });
   }
 };
+
 
 export const login = async (req, res) => {
   try {
