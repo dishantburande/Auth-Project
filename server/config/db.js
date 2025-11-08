@@ -1,21 +1,30 @@
 import mongoose from "mongoose";
 import User from "../models/User.js";
+import dotenv from "dotenv";
 
-const MONGO_URL= "mongodb+srv://dishant:dishant123@cluster0.6lb6vze.mongodb.net/?appName=Cluster0";
+dotenv.config();
 
-const ConnectDB = async()=>{
-try {
-    await mongoose.connect(MONGO_URL, { useNewUrlParser: true, useUnifiedTopology: true})
+const username = process.env.MONGO_USER;
+const password = process.env.MONGO_PASS;
 
-    console.log("MongoDB connected Successfully")
+const MONGO_URL = `mongodb+srv://${username}:${password}@cluster0.6lb6vze.mongodb.net/?appName=Cluster0`;
+
+const ConnectDB = async () => {
+  try {
+    await mongoose.connect(MONGO_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    console.log("MongoDB connected Successfully");
 
     await User.createCollection();
 
-    console.log("User Collection created Successfully")
-} catch (error) {
-    console.error("MongoDB Connection Failed", error.message)
-    process.exit(1)
-}
-} 
+    console.log("User Collection created Successfully");
+  } catch (error) {
+    console.error("MongoDB Connection Failed", error.message);
+    process.exit(1);
+  }
+};
 
 export default ConnectDB;

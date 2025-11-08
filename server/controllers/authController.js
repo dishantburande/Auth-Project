@@ -4,14 +4,18 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import User from "../models/User.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import dotenv from "dotenv";
 
-const SECRET_KEY = 'd5db26ad72217185d796ed0b1f69020a4f674d0979308577c2803386cfc9808b' // Use environment variables in production;
+dotenv.config();
+
+
+
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "dishant.burande@gmail.com",
-    pass: "vuahxqnsrjsftodw",
+    pass: process.env.EMAIL_PASS,
   },
 });
 
@@ -48,14 +52,12 @@ export const register = async (req, res) => {
       from: "dishant.burande@gmail.com",
       to: email,
       subject: "OTP Verification",
-      text: `Your OPT is : ${otp}`,
+      text: `Your OTP is : ${otp}`,
     });
 
-    res
-      .status(201)
-      .json({
-        message: " User Register. Please verify OTP  send to your email",
-      });
+    res.status(201).json({
+      message: " User Register. Please verify OTP  send to your email",
+    });
   } catch (error) {
     res.status(500).json({ message: " Error while registering User", error });
   }
@@ -88,14 +90,14 @@ export const verifyOPT = async (req, res) => {
 
 // Rsend OTP
 
-
 export const resendOTP = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email });
 
     if (!user) return res.status(400).json({ message: "User not Found" });
-    if (user.isVerified) return res.status(400).json({ message: "User already Verified" });
+    if (user.isVerified)
+      return res.status(400).json({ message: "User already Verified" });
 
     const otp = generateOTP();
     user.otp = otp;
@@ -117,7 +119,6 @@ export const resendOTP = async (req, res) => {
   }
 };
 
-
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -135,12 +136,9 @@ export const login = async (req, res) => {
         .json({ message: "Email not verified. Please verify OTP." });
     }
 
-    //  Hardcoded Secret Key
-    const SECRET_KEY =
-      "d5db26ad72217185d796ed0b1f69020a4f674d0979308577c2803386cfc9808b";
 
     // Generate JWT token
-    const token = jwt.sign({ id: user._id, email: user.email }, SECRET_KEY, {
+    const token = jwt.sign({ id: user._id, email: user.email }, process.env.SECRET_KEY, {
       expiresIn: "1h",
     });
 

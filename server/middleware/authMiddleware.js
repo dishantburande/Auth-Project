@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken'
-const SECRET_KEY = "d5db26ad72217185d796ed0b1f69020a4f674d0979308577c2803386cfc9808b"
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 function authenticateToken(req, res, next) {
     // Ensure req.cookies exists
@@ -13,7 +15,7 @@ if (!token) {
     return res.status(401).json({ message: 'Access denied. No token provided.' });
 }
 try {
-    const decoded = jwt.verify(token, SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.SECRET_KEY);
     req.user = decoded; // Attach decoded token info to the request
     next();
 } catch (error) {
